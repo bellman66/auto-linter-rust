@@ -2,14 +2,16 @@
 
 mod parse;
 
-// import the prelude to get access to the `rsx!` macro and the `Scope` and `Element` types
-use parse::java_parser::context;
+use std::path::Path;
+use crate::parse::java_parser::context;
 
 fn main() {
     // launch the dioxus app in a webview
     // dioxus_desktop::launch(App);
 
-    let string = context::read();
+    let path = Path::new("/Users/june/workspace/auto-linter-rust/target.java");
 
-    println!("{}", string)
+    let string = context::read_file_by_path(path);
+
+    println!("{:?}", string)
 }
