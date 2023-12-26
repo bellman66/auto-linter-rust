@@ -1,8 +1,9 @@
 
-trait Create {
+pub trait Create {
     fn create(content: String) -> Self;
 }
 
+#[derive(Debug)]
 pub struct Header {
     content: String
 }
@@ -15,6 +16,7 @@ impl Create for Header {
     }
 }
 
+#[derive(Debug)]
 pub struct Body {
     content: String
 }

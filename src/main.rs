@@ -13,5 +13,9 @@ fn main() {
 
     let lines = context::read_file_by_path(path);
 
-    context::split_header_body(&lines);
+    let (header, body) = context::split_header_body(&lines);
+
+    println!("header : {:?}", header);
+
+    println!("body : {:?}", body);
 }
