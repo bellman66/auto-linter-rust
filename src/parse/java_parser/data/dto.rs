@@ -1,6 +1,7 @@
 
 pub trait Create {
     fn create(content: String) -> Self;
+    fn get_content(&self) -> &str;
 }
 
 #[derive(Debug)]
@@ -14,6 +15,10 @@ impl Create for Header {
             content
         }
     }
+
+    fn get_content(&self) -> &str {
+        &self.content
+    }
 }
 
 #[derive(Debug)]
@@ -26,5 +31,9 @@ impl Create for Body {
         Body {
             content
         }
+    }
+
+    fn get_content(&self) -> &str {
+        &self.content
     }
 }

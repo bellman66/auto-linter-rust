@@ -25,3 +25,10 @@ pub fn split_header_body(lines: &str) -> (Header, Body) {
 
     (Header::create(header_content), Body::create(body_content))
 }
+
+pub fn extract_header_line(content: &str) -> Vec<String> {
+    content.split(';')
+        .filter(|value| value.contains("package") || value.contains("import"))
+        .map(|value| String::from(value.trim()))
+        .collect::<Vec<String>>()
+}
