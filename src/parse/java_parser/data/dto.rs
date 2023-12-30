@@ -1,23 +1,29 @@
+use std::collections::hash_map::Values;
+use crate::parse::java_parser::context::extract_header_line;
 
-pub trait Create {
-    fn create(content: String) -> Self;
-    fn get_content(&self) -> &str;
-}
 
 #[derive(Debug)]
 pub struct Header {
-    content: String
+    value_array: Vec<String>
 }
 
-impl Create for Header {
-    fn create(content: String) -> Self {
+impl Header {
+
+    pub fn create(content: String) -> Self {
         Header {
-            content
+            value_array: extract_header_line(content)
         }
     }
 
-    fn get_content(&self) -> &str {
-        &self.content
+    fn extract_header_line(content: String) -> Vec<String> {
+        content.split(';')
+            .filter(|value| value.contains("package") || value.contains("import"))
+            .map(|value| String::from(value.trim()))
+            .collect::<Vec<String>>()
+    }
+
+    pub fn get_content(&self) -> &Vec<String> {
+        &self.value_array
     }
 }
 
@@ -26,14 +32,10 @@ pub struct Body {
     content: String
 }
 
-impl Create for Body {
-    fn create(content: String) -> Self {
+impl Body {
+    pub fn create(content: String) -> Self {
         Body {
             content
         }
-    }
-
-    fn get_content(&self) -> &str {
-        &self.content
     }
 }

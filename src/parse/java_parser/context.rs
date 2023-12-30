@@ -3,7 +3,7 @@ use std::fs::{File};
 use std::string::String;
 use std::io::{BufReader, Read};
 use std::path::Path;
-use crate::parse::java_parser::data::dto::{Header, Body, Create};
+use crate::parse::java_parser::data::dto::{Header, Body};
 
 const INTERFACE_TARGET: &'static str = "interface";
 
@@ -26,7 +26,7 @@ pub fn split_header_body(lines: &str) -> (Header, Body) {
     (Header::create(header_content), Body::create(body_content))
 }
 
-pub fn extract_header_line(content: &str) -> Vec<String> {
+pub fn extract_header_line(content: String) -> Vec<String> {
     content.split(';')
         .filter(|value| value.contains("package") || value.contains("import"))
         .map(|value| String::from(value.trim()))
