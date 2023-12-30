@@ -1,8 +1,16 @@
+use std::collections::HashMap;
+use crate::parse::java_parser::data::dto::HeaderPrevious::{Import, Package};
 
-#[derive(Debug)]
+#[derive(Eq, Hash, PartialEq)]
+enum HeaderPrevious {
+    Package,
+    Import,
+    StaticImport
+}
+
 pub struct Header {
     is_package_contains: bool,
-    value_array: Vec<String>
+    value_array: HashMap<HeaderPrevious, String>
 }
 
 impl Header {
@@ -20,28 +28,27 @@ impl Header {
         content.contains("package ")
     }
 
-    fn extract_header_line(content: String) -> Vec<String> {
+    fn extract_header_line(content: String) -> HashMap<HeaderPrevious, String> {
+        let mut result: HashMap<HeaderPrevious, String> = HashMap::<HeaderPrevious, String>::new();
+
         content.split(';')
-            .filter(|value| value.contains("package") || value.contains("import"))
-            .map(|value| String::from(value.trim()))
-            .collect::<Vec<String>>()
+            .map(|value| value.trim())
+            .for_each(|line| {
+                if line.contains("package ") {
+                    result.insert(Package, line.to_string());
+                }
+                else if line.contains("import ") {
+                    result.insert(Import, line.to_string());
+                }
+            });
+        result
     }
 
     pub fn get_content(&self) -> String {
         let mut result = String::new();
-        let mut start = 0;
-        let end = self.value_array.len();
 
-        if self.is_package_contains {
-            start = 1;
-            result.push_str(&self.value_array[0]);
-            result.push_str(Self::NEXT_LINE)
-        }
 
-        for idx in start..end {
-            result.push_str(&self.value_array[idx]);
-            result.push_str(Self::NEXT_LINE)
-        }
+
         result
     }
 }
