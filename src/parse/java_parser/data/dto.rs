@@ -21,14 +21,13 @@ impl Header {
 
         content.split(';')
             .map(|value| value.trim())
-            .filter(|value| value.starts_with("package ") || value.starts_with("import ") || value.starts_with("import static "))
             .for_each(|value| {
                 if value.starts_with("package ") {
                     package = value.to_string();
                 } else if value.starts_with("import ") {
                     import_group.push(value.to_string())
                 } else if value.starts_with("import static ") {
-                    import_group.push(value.to_string())
+                    static_import_group.push(value.to_string())
                 }
             });
 
