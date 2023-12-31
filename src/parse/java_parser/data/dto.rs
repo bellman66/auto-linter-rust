@@ -1,16 +1,13 @@
-use std::collections::HashMap;
-use crate::parse::java_parser::data::dto::HeaderPrevious::{Import, Package};
-
-#[derive(Eq, Hash, PartialEq)]
-enum HeaderPrevious {
+enum HeaderType {
     Package,
     Import,
     StaticImport
 }
 
 pub struct Header {
-    is_package_contains: bool,
-    value_array: HashMap<HeaderPrevious, String>
+    package: String,
+    import_group: Vec<String>,
+    static_import_group: Vec<String>
 }
 
 impl Header {
@@ -18,39 +15,62 @@ impl Header {
     const NEXT_LINE: &'static str = "\n";
 
     pub fn create(content: String) -> Self {
-        Header {
-            is_package_contains: Self::check_package_previous(&content),
-            value_array: Self::extract_header_line(content)
-        }
-    }
-
-    fn check_package_previous(content: &String) -> bool {
-        content.contains("package ")
-    }
-
-    fn extract_header_line(content: String) -> HashMap<HeaderPrevious, String> {
-        let mut result: HashMap<HeaderPrevious, String> = HashMap::<HeaderPrevious, String>::new();
+        let mut package = String::new();
+        let mut import_group: Vec<String> = vec![];
+        let mut static_import_group: Vec<String> = vec![];
 
         content.split(';')
             .map(|value| value.trim())
-            .for_each(|line| {
-                if line.contains("package ") {
-                    result.insert(Package, line.to_string());
-                }
-                else if line.contains("import ") {
-                    result.insert(Import, line.to_string());
+            .filter(|value| value.starts_with("package ") || value.starts_with("import ") || value.starts_with("import static "))
+            .for_each(|value| {
+                if value.starts_with("package ") {
+                    package = value.to_string();
+                } else if value.starts_with("import ") {
+                    import_group.push(value.to_string())
+                } else if value.starts_with("import static ") {
+                    import_group.push(value.to_string())
                 }
             });
-        result
+
+        Header {
+            package,
+            import_group,
+            static_import_group
+        }
     }
 
     pub fn get_content(&self) -> String {
         let mut result = String::new();
 
-
+        self.add_line(&mut result, &self.package);
+        self.add_line_group(&mut result, &self.import_group);
+        self.add_line_group(&mut result, &self.static_import_group);
 
         result
     }
+
+    fn add_line(&self, builder: &mut String, line: &str) {
+        if line.is_empty() {
+            return;
+        }
+
+        builder.push_str(line);
+        builder.push_str(Self::NEXT_LINE);
+    }
+
+    fn add_line_group(&self, builder: &mut String, line_group: &Vec<String>) {
+        if line_group.is_empty() {
+            return;
+        }
+
+        builder.push_str(Self::NEXT_LINE);
+
+        line_group.iter()
+            .for_each(|value| {
+                self.add_line(builder, value);
+            })
+    }
+
 }
 
 #[derive(Debug)]
